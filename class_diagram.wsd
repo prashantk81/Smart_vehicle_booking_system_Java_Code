@@ -1,0 +1,181 @@
+@startuml
+
+class User
+{
+    -ID: Integer
+    -Name: String
+    -password: String
+    -phoneNumber: Integer
+    -gender: Integer
+    -isLogin: Boolean
+    +constructor()
+    +getters()
+    +setters()
+}
+class Admin
+{
+    -privileges: String
+}
+class Customer
+{ 
+    -idProof: IDProof
+    -wallet: Wallet
+    -tripHistory: List
+    -dues: Double
+    -location: String
+}
+class IDProof
+{
+    -idNum: Integer
+    -idType: String
+    +constructor()
+    +getters()
+    +setters()
+}
+class Wallet
+{
+    -balance: Double
+    -autoDeductEnabled: Boolean
+    +addMoney(String: modeOfPayment): void
+    +constructor()
+    +getters()
+    +setters()
+}
+class UserAccountManager
+{
+    +createAccount()
+    +logIn(User user)
+    +logOut(User user)
+    +uploadId()
+    +verifyId()
+}
+class PaymentMethod
+{
+    -paymentId: String
+    +constructor()
+    +getters()
+    +setters()
+    +makePayment(Customer customer, amount: Double)
+
+}
+class UPI
+{
+    -upiId: String
+}
+class Card
+{
+    -cardType: String
+    -cardProviderId: String
+}
+class NetBanking
+{
+    -transId: String
+}
+class PaymentManager
+{
+    +deductAmount(Double fare, Customer customer,String modeOfPayment)
+    +checkSufficientBalance(Double Fare,Customer customer):Boolean
+    +autoDeduct(Double Fare,Customer customer)
+    +manualPayViaWallet()
+    +payViaOtherPaymentMethod(String modeOfPayment)
+    +settleDues()
+}
+class SmartVehicle
+{
+    -vehicleId: Integer
+    -qrCode: List<List>[][]
+    -type: String 
+    -occupied: Boolean
+    -numberOfTrips: Integer
+    -rating: Integer
+    -supportManualPdf: String
+    -station: DockingStation
+    +constructor()
+    +getters()
+    +setters()
+}
+class motorVehicle
+{
+    -regNumber: String
+    -fuelLevel: Double
+    -distanceTravelled : Double
+}
+class DockingStation
+{
+    -id: Integer
+    -location: String
+    -vehicleCapacity: Integer
+    -currentVehicles: List<SmartVehicle>
+    -lastmaIntegerenanceDate: String
+    +constructor()
+    +getters()
+    +setters()
+}
+class DockingStationManager
+{
+    -dockingStation: List<DockingStation>
+    +updateDockingStation(DockingStation dockingStation,SmartVehicle smartvehicle)
+    +addDockingStation(DockingStation dockingstation)
+    +removeDockingStation(DockingStation dockingstation)
+    +getDockingStationList(): List<DockingStation>
+}
+class TripFareCalculator
+{
+    -fine: Double
+    -baseFares: List<Double>
+    +calculateTripFare(Trip trip): Double
+    
+}
+class Trip
+{
+    -distance: Double
+    -duration: Integer
+    -customer: Customer
+    -vehicle: SmartVehicle
+    -feedback: String
+    -rating: Integer
+    -srcDockingStation: DockingStation
+    -dstDockingStation: DockingStation
+    +constructor()
+    +getters()
+    +setters()
+}
+class TripManager
+{
+    +locateVehicle(Customer customer): List<SmartVehicle>
+    +startTrip(Customer customer,SmartVehicle vehicle): void 
+    +requestDSMToUpdate(DockingStation dockerstation, SmartVehicle vehicle)
+    ' trip has been created at a startTrip()
+    +endTrip(Trip trip)
+    +requestFareCalculation(Trip trip)
+    +informPaymentManager(Double fare, Customer customer)
+    +updateTripHistory(Trip trip)
+    +requestFeedback(Trip trip)
+    +receiveFeedback(Trip trip)
+    +updateVehicleRating(Trip trip)
+}
+
+User <|-- Admin
+User <|-- Customer
+Wallet "1" -* "1" Customer
+Customer "1" *- "1" IDProof
+Wallet ..> PaymentMethod: uses
+SmartVehicle <|-- motorVehicle
+PaymentMethod <|-- UPI
+PaymentMethod <|-- Card
+PaymentMethod <|-- NetBanking
+PaymentManager ..> Customer: uses
+PaymentManager ..> PaymentMethod: uses
+PaymentMethod ..> Customer: uses
+
+TripManager ..> PaymentManager: uses
+TripManager ..> Trip: uses
+TripManager ..> TripFareCalculator: uses
+TripManager ..>  SmartVehicle: uses
+TripManager ..>  Customer: uses
+TripManager "1" o-- "1" DockingStationManager
+DockingStationManager ..> DockingStation: uses
+DockingStation "1" o-- "0..*" SmartVehicle
+UserAccountManager ..> User: uses
+@enduml
+
